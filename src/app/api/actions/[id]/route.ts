@@ -12,10 +12,13 @@ import { getAction } from "@/lib/dev-store";
 // }
 // const action = { id: docSnap.id, ...docSnap.data() }
 
-type Params = { params: { id: string } };
+export async function GET(
+  _req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
 
-export async function GET(_: Request, { params }: Params) {
-  const action = getAction(params.id);
+  const action = getAction(id);
   if (!action) {
     return NextResponse.json({ error: "Action not found" }, { status: 404 });
   }

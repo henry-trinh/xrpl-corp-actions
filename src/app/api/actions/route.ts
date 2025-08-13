@@ -2,8 +2,7 @@
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
-// import { mockActions } from "@/lib/mock-data"; // <-- remove
-import { listActions, createAction } from "@/lib/dev-store"; // <-- add
+import { listActions, createAction } from "@/lib/dev-store";
 import { sendAnnouncementMemo } from "@/lib/xrpl";
 
 export async function GET() {

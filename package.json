@@ -24,6 +24,7 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-hook-form": "^7.62.0",
+    "tw-animate-css": "1.3.6",
     "xrpl": "^4.4.0",
     "zod": "^4.0.17"
   },

@@ -9,18 +9,26 @@ import {
 } from "@/lib/dev-store";
 import { payDividend } from "@/lib/xrpl";
 
-type Params = { params: { id: string } };
-
-export async function POST(_: Request, { params }: Params) {
+export async function POST(req: Request, context: any) {
   try {
-    const actionId = params.id;
+    const { id: actionId } = (context?.params ?? {}) as { id: string };
+
+    if (!actionId) {
+      return NextResponse.json({ error: "Missing 'id' param" }, { status: 400 });
+    }
+
     const action = getAction(actionId);
-    if (!action) return NextResponse.json({ error: "Action not found" }, { status: 404 });
+    if (!action) {
+      return NextResponse.json({ error: "Action not found" }, { status: 404 });
+    }
 
     const snap = getLatestSnapshotForAction(actionId);
-    if (!snap) return NextResponse.json({ error: "No snapshot found" }, { status: 400 });
+    if (!snap) {
+      return NextResponse.json({ error: "No snapshot found" }, { status: 400 });
+    }
 
-    const perShare = action.type === "dividend" ? Number(action.payoutPerShare || 0) : 0;
+    const perShare =
+      action.type === "dividend" ? Number(action.payoutPerShare || 0) : 0;
 
     const results: Array<{
       id: string;
@@ -51,7 +59,7 @@ export async function POST(_: Request, { params }: Params) {
         };
         addPayout(row);
         results.push(row);
-      } catch (e: any) {
+      } catch {
         const row = {
           id: `${actionId}_${h.address}_${Date.now()}`,
           actionId,
@@ -65,14 +73,16 @@ export async function POST(_: Request, { params }: Params) {
       }
     }
 
-    // Mark action paid if we sent at least one payout
-    if (results.some(r => r.status === "sent")) {
+    if (results.some((r) => r.status === "sent")) {
       markActionPaid(actionId);
     }
 
     return NextResponse.json({ actionId, results });
   } catch (e: any) {
     console.error("Payout error:", e);
-    return NextResponse.json({ error: String(e?.message ?? e) }, { status: 502 });
+    return NextResponse.json(
+      { error: String(e?.message ?? e) },
+      { status: 502 }
+    );
   }
 }

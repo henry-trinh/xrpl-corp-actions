@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { Add, Visibility, CameraAlt, Payment, OpenInNew } from "@mui/icons-material";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useMemo, useState, useEffect } from "react";
 import type { ActionStatus, ActionType } from "@/types";
 
@@ -47,7 +47,6 @@ export function ActionsContent() {
   const [searchTerm, setSearchTerm] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedAction, setSelectedAction] = useState<any | null>(null);
-  const searchParams = useSearchParams();
   const qc = useQueryClient();
 
   const snapMut = useMutation({
@@ -77,21 +76,22 @@ export function ActionsContent() {
       return response.json();
     },
   });
+useEffect(() => {
+    if (!actions?.length || dialogOpen || selectedAction) return;
+    const params = new URLSearchParams(window.location.search);
+    const openId = params.get("open");
+    if (!openId) return;
 
-  useEffect(() => {
-    const openId = searchParams.get("open");
-    if (!openId || !actions?.length || dialogOpen || selectedAction) return;
-  
     const found = actions.find((a: any) => a.id === openId);
-    if (found) {
-      setSelectedAction(found);
-      setDialogOpen(true);
-  
-      const url = new URL(window.location.href);
-      url.searchParams.delete("open");
-      window.history.replaceState(null, "", url.toString());
-    }
-  }, [searchParams, actions, dialogOpen, selectedAction]);
+    if (!found) return;
+    
+    setSelectedAction(found);
+    setDialogOpen(true);
+
+    const url = new URL(window.location.href);
+    url.searchParams.delete("open");
+    const next = url.search ? url.toString() : `${url.origin}${url.pathname}${url.hash}`;
+    window.history.replaceState(null, "", next);}, [actions, dialogOpen, selectedAction]);
   
   const filteredActions = useMemo(() => {
     return actions.filter((action: any) => {
