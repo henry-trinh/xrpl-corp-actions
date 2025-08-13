@@ -23,7 +23,7 @@ import { useQuery } from "@tanstack/react-query"
 import { useState } from "react"
 
 export function HoldingsContent() {
-  const [address, setAddress] = useState("rN7n7otQDd6FczFgLdSqtcsAUxDkw6fzRH")
+  const [address, setAddress] = useState("rJ27Xoga8FuEL5oeGmMLcWaJwF7YcZh4WP") // testnet address; can be 
 
   const {
     data: holdings,

@@ -246,7 +246,7 @@ export function AppShell({ children }: AppShellProps) {
         <Toolbar />
 
         <Alert severity="info" sx={{ mb: 2 }} variant="outlined">
-          <strong>Demo only.</strong> Simulated tokens (e.g., DIS.Share) and testnet XRP payouts. Not real stocks.
+          <strong>Demo only.</strong> Simulated tokens (e.g., DEMO.Share) and testnet XRP payouts. Not real stocks.
         </Alert>
 
         {children}

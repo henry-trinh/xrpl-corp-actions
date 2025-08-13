@@ -77,16 +77,17 @@ export function CreateActionContent() {
 
   const createActionMutation = useMutation({
     mutationFn: async (data: CreateActionForm) => {
+      // constructing memoJson to send and preview new corporate actions
       const memoJson = {
-        type: data.type,
-        company: data.company,
+        event: data.type,
         token: data.token,
-        recordDate: data.recordAt,
+        recordAt: data.recordAt,
+        payableAt: data.payableAt,
         ...(data.type === "dividend" && { payoutPerShare: data.payoutPerShare }),
         ...(data.type === "split" && { splitRatio: data.splitRatio }),
         ...(data.attachmentUrl && { attachmentUrl: data.attachmentUrl }),
         ...(data.attachmentHash && { attachmentHash: data.attachmentHash }),
-      }
+      };
 
       const response = await fetch("/api/actions", {
         method: "POST",
@@ -106,7 +107,7 @@ export function CreateActionContent() {
     },
     onSuccess: (data) => {
       enqueueSnackbar("Corporate action created successfully", { variant: "success" })
-      router.push(`/actions/${data.id}`)
+      router.push(`/actions?open=${data.id}`)
     },
     onError: () => {
       enqueueSnackbar("Failed to create corporate action", { variant: "error" })
@@ -119,15 +120,15 @@ export function CreateActionContent() {
 
   // Generate preview memo JSON
   const previewMemo = {
-    type: formData.type,
-    company: formData.company || "",
+    event: formData.type,
     token: formData.token || "",
-    recordDate: formData.recordAt || "",
+    recordAt: formData.recordAt || "",
+    payableAt: formData.payableAt || "",
     ...(formData.type === "dividend" && formData.payoutPerShare && { payoutPerShare: formData.payoutPerShare }),
     ...(formData.type === "split" && formData.splitRatio && { splitRatio: formData.splitRatio }),
     ...(formData.attachmentUrl && { attachmentUrl: formData.attachmentUrl }),
     ...(formData.attachmentHash && { attachmentHash: formData.attachmentHash }),
-  }
+  };  
 
   const previewHex = Buffer.from(JSON.stringify(previewMemo)).toString("hex")
 
@@ -160,7 +161,7 @@ export function CreateActionContent() {
                       fullWidth
                       error={!!errors.token}
                       helperText={errors.token?.message}
-                      placeholder="e.g., DIS.Share"
+                      placeholder="e.g., DEMO.Share"
                     />
                   </Grid>
 
